@@ -16,10 +16,6 @@
     print-color-adjust: exact;
   }
 
-  @page {
-    size: A4;
-    margin: 0;
-  }
 
   body {
     background-image: url("back.png") !important;
@@ -28,17 +24,11 @@
     background-position: center !important;
   }
 
-  table {
-    width: 95%;
-    margin: 0 auto;
-    border-collapse: collapse;
-    page-break-inside: avoid;
-    font-size: 12px; /* shrink text */
-  }
- button {
+   button {
     display: none !important;
   }
 }
+
 
     body {
         font-family: Arial, sans-serif;
@@ -189,7 +179,7 @@
 </span>
 </div>
 
-
+<button onclick="saveSinglePage()">Save PDF</button>
 <br><br>
 
 <table>
@@ -219,30 +209,11 @@
 
 </table>
 </div>
-<button onclick="saveSinglePage()">Save PDF</button>
+
 
 </body>
 </html>
 <script>
-function saveSinglePage() {
-  const body = document.body;
-  const rect = body.getBoundingClientRect();
-
-  // A4 size in px at 96dpi
-  const A4 = { width: 793.7, height: 1122.5 };
-  const scale = Math.min(A4.width / rect.width, A4.height / rect.height);
-
-  body.style.transformOrigin = "top left";
-  body.style.transform = `scale(${scale})`;
-
-  window.print();
-
-  // Reset after print
-  setTimeout(() => {
-    body.style.transform = "";
-    body.style.transformOrigin = "";
-  }, 500);
-}
 function generateDates() {
 
     const monthIndex = document.getElementById("monthSelect").value;
@@ -347,15 +318,23 @@ function calculateTotals() {
     document.getElementById("totalEmpty").innerText = emptyTotal;
     document.getElementById("totalAmount").innerText = amountTotal;
 }
+function saveSinglePage() {
+  const body = document.body;
+  const rect = body.getBoundingClientRect();
 
+  // A4 size in px at 96dpi
+  const A4 = { width: 793.7, height: 1122.5 };
+  const scale = Math.min(A4.width / rect.width, A4.height / rect.height);
+
+  //body.style.transformOrigin = "top left";
+ // body.style.transform = `scale(${scale})`;
+
+  window.print();
+
+  // Reset after print
+  setTimeout(() => {
+    body.style.transform = "";
+    body.style.transformOrigin = "";
+  }, 500);
+}
 </script>
-
-
-
-
-
-
-
-
-
-

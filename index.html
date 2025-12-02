@@ -10,6 +10,16 @@
     padding: 0;
     height: 100%; 
   }
+  #invoice {
+    background-image: url("back.png") !important;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+
  button {
     display: none !important;
   }
@@ -130,7 +140,7 @@
 </head>
 <body>
 
-<div class="invoice-box">
+<div class="invoice-box" id="invoice">
 <div class="header-section">
 
     <div class="center-title">
@@ -305,6 +315,7 @@ function calculateTotals() {
 }
 
 </script>
+
 
 
 

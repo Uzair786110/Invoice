@@ -8,18 +8,33 @@
   html, body {
     margin: 0;
     padding: 0;
-    height: 100%; 
+    height: 100%;
   }
-  #invoice {
-    background-image: url("back.png") !important;
-    background-size: cover !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
+
+  * {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
 
+  @page {
+    size: A4;
+    margin: 0;
+  }
 
+  body {
+    background-image: url("back.png") !important;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+  }
+
+  table {
+    width: 95%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    page-break-inside: avoid;
+    font-size: 12px; /* shrink text */
+  }
  button {
     display: none !important;
   }
@@ -144,7 +159,7 @@
 <div class="header-section">
 
     <div class="center-title">
-        BILLED TOhh: <strong>SM Rizvi Textile</strong>
+        BILLED TO: <strong>SM Rizvi Textile</strong>
     </div>
 
    
@@ -204,11 +219,31 @@
 
 </table>
 </div>
-<button onclick="window.print()">PDF</button>
+<button onclick="saveSinglePage()">Save PDF</button>
 
 </body>
 </html>
 <script>
+  <script>
+function saveSinglePage() {
+  const body = document.body;
+  const rect = body.getBoundingClientRect();
+
+  // A4 size in px at 96dpi
+  const A4 = { width: 793.7, height: 1122.5 };
+  const scale = Math.min(A4.width / rect.width, A4.height / rect.height);
+
+  body.style.transformOrigin = "top left";
+  body.style.transform = `scale(${scale})`;
+
+  window.print();
+
+  // Reset after print
+  setTimeout(() => {
+    body.style.transform = "";
+    body.style.transformOrigin = "";
+  }, 500);
+}
 function generateDates() {
 
     const monthIndex = document.getElementById("monthSelect").value;
@@ -315,6 +350,7 @@ function calculateTotals() {
 }
 
 </script>
+
 
 
 

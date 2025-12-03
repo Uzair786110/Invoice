@@ -4,33 +4,7 @@
 <meta charset="UTF-8">
 <title>Invoice Table</title>
 <style>
-@media print {
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-  }
-
-  * {
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-
-  body {
-    background-image: url("back.png") !important;
-    background-size: cover !important;
-    background-repeat: no-repeat !important;
-    background-position: center !important;
-  }
-
-   button {
-    display: none !important;
-  }
-}
-
-
-    body {
+ body {
         font-family: Arial, sans-serif;
         background: #a6d9f0;
          background-image: url("back.png"); 
@@ -106,8 +80,16 @@
 
 .right-contact {
     float:right;
-    width: 250px;
+    width: 50%;
+    margin-top: 20px;
     text-align: right;
+    font-weight: bold;
+}
+.left-contact {
+    float:left;
+    margin-top: 20px;
+    width: 50%;
+    text-align: left;
     font-weight: bold;
 }
 .info-line {
@@ -117,6 +99,7 @@
 
 .month-line {
     display: inline-block;
+    text-align: right;
     padding-bottom: 3px;
     border-bottom: 2px dotted #000; /* dotted underline */
     width: 200px;                   /* adjust length as needed */
@@ -139,7 +122,27 @@
     outline: none;
 }
 
+ #prevBalance {
+    width: 120px;
+    padding: 6px 10px;
+    margin-left: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: right;
+    background-color: #a6d9f0;
+    color: #222;
+    outline: none;
+    transition: all 0.3s ease;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
 
+  #prevBalance:focus {
+    border-color: #2a7f9c;
+    box-shadow: 0 0 5px rgba(42, 127, 156, 0.5);
+    background-color: #fff;
+  }
 
 </style>
 </head>
@@ -151,12 +154,10 @@
     <div class="center-title">
         BILLED TO: <strong>SM Rizvi Textile</strong>
     </div>
-
-   
     
 </div>
  <div class="right-contact">
-        Contact Nos: <strong>03242419752</strong>
+        Contact No: <strong>03242419752</strong>
     </div>
 
    <div class="info-line">
@@ -178,10 +179,6 @@
 </select>
 </span>
 </div>
-
-<button onclick="saveSinglePage()">Save PDF</button>
-<br><br>
-
 <table>
     <thead>
         <tr>
@@ -208,9 +205,18 @@
 </tfoot>
 
 </table>
+<div style="margin-bottom: 30px;">
+<div class="left-contact">
+  Previous Balance:
+  <input class="month-line" type="number" id="prevBalance" value="0" />
 </div>
 
-
+<div class="right-contact">
+  Total Amount:
+  <span id="finalAmount" class="month-line">0</span>
+</div>
+</div>
+</div>
 </body>
 </html>
 <script>
@@ -234,7 +240,7 @@ function generateDates() {
         row.innerHTML = `
             <td>${formattedDate}</td>
 
-            <td contenteditable="true" class="bottle"></td>
+            <td contenteditable="true" class="bottle" id="bot"></td>
             <td class="empty">-</td>
 
             <td contenteditable="true" class="rate">-</td>
@@ -247,35 +253,6 @@ function generateDates() {
 
     attachAutoCalculation();
 }
-
-function attachAutoCalculation() {
-    const rows = document.querySelectorAll("#dateRows tr");
-
-    rows.forEach(row => {
-        const bottleCell = row.querySelector(".bottle");
-        const emptyCell = row.querySelector(".empty");
-        const rateCell = row.querySelector(".rate");
-        const amountCell = row.querySelector(".amount");
-
-        function calculate() {
-            // defer until after DOM update
-            setTimeout(() => {
-                const bottleVal = parseFloat(bottleCell.textContent.trim()) || 0;
-                const rateVal = parseFloat(rateCell.textContent.trim()) || 80;
-
-                emptyCell.textContent = bottleVal;
-                rateCell.textContent = rateVal; // keep 70 fixed
-                amountCell.textContent = bottleVal * rateVal;
-
-                calculateTotals();
-            }, 0);
-        }
-
-        bottleCell.addEventListener("input", calculate);
-        rateCell.addEventListener("input", calculate);
-    });
-}
-
 
 function attachAutoCalculation() {
 
@@ -295,6 +272,7 @@ function attachAutoCalculation() {
             emptyCell.innerText = bottleVal;
             rateCell.innerText = '70';
             amountCell.innerText =  emptyCell.innerText * 70;
+            
 
             calculateTotals(); // Update totals
         }
@@ -312,29 +290,31 @@ function calculateTotals() {
         bottleTotal += parseFloat(row.querySelector(".bottle").innerText) || 0;
         emptyTotal += parseFloat(row.querySelector(".empty").innerText) || 0;
         amountTotal += parseFloat(row.querySelector(".amount").innerText) || 0;
+         
     });
 
     document.getElementById("totalBottle").innerText = bottleTotal;
     document.getElementById("totalEmpty").innerText = emptyTotal;
     document.getElementById("totalAmount").innerText = amountTotal;
+    updateFinalAmount();
 }
-function saveSinglePage() {
-  const body = document.body;
-  const rect = body.getBoundingClientRect();
+function updateFinalAmount() {
+  // Get values
+  const prevBalance = parseFloat(document.getElementById("prevBalance").value) || 0;
+  const tableAmount = parseFloat(document.getElementById("totalAmount").textContent) || 0;
 
-  // A4 size in px at 96dpi
-  const A4 = { width: 793.7, height: 1122.5 };
-  const scale = Math.min(A4.width / rect.width, A4.height / rect.height);
+  // Add them
+  const final = prevBalance + tableAmount;
 
-  //body.style.transformOrigin = "top left";
- // body.style.transform = `scale(${scale})`;
-
-  window.print();
-
-  // Reset after print
-  setTimeout(() => {
-    body.style.transform = "";
-    body.style.transformOrigin = "";
-  }, 500);
+  // Update both places
+  document.getElementById("finalAmount").textContent = final;   // update right-contact span
 }
+
+// Trigger update when user types
+document.getElementById("prevBalance").addEventListener("input", updateFinalAmount);
+
+
+// Run once on load
+updateFinalAmount();
 </script>
+
